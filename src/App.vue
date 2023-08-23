@@ -104,7 +104,6 @@
           currentPos[cords] = place.value[ parseInt( posInArr[cords] ) ].classList[3];
         }else
           currentPos[String(`${i}${j}`)] = "";
-
       }
     }
     console.log(currentPos,posInArr)
