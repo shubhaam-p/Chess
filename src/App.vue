@@ -21,7 +21,7 @@
     let difference = Math.abs(parseInt(currentPos) - parseInt(pos));
     let defaultPosOfPiece = String(defaultPos[selectedPiece][0])[1]
     if(!((difference == 2) || difference == 1)){
-      console.log("Illegal move")
+      console.log("Illegal move") 
       returnValue = false
     }
     return returnValue
