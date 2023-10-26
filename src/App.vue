@@ -10,7 +10,9 @@
   var posInArr = []
   var currentBoard = []
   var selectedPiece = null;
-  let avMoves = []
+  var avMoves = []
+  let av = ''
+  let knightValidMoves = [];
 
   const pawnMove=(currentPos, pos, selectedPiece)=>{
     // By finding default (row) position of pawn can determine whether it is moving forward or backward
@@ -27,136 +29,203 @@
     return returnValue
   }
 
- function getAvailableMoves(currentPos, pos, piece){
-  if(parseInt(currentPos) < 11)
-    return
+  function getAvailableMoves(currentPos, pos, piece){
+    if(parseInt(currentPos) < 11)
+      return
 
-  let colorOfPiece = piece[0];
-  let col = parseInt(String(currentPos)[0])
-  let row = parseInt(String(currentPos)[1])
-  let moveCol = parseInt(String(pos)[0])
-  let moveRow = parseInt(String(pos)[1])
-  let colArr = []
-  let rowArr = []
-  for(let i=8; i>=1; i--){
-    let rowCords = `${col}${i}`;//parseInt(String(col)+String(i));
-    let colCords = `${i}${row}`;
-    let pieceOnColCords = place.value[ parseInt( posInArr[colCords] ) ].classList[3];
-    let pieceOnRowCords = place.value[ parseInt( posInArr[rowCords] ) ].classList[3];
-    
-    if(parseInt(colCords) !== parseInt(currentPos)){
-      if(typeof(pieceOnColCords) === 'undefined'){
-        // console.log("con1 ",colCords)
-        colArr.push(colCords)
-      }
-      else if(typeof(pieceOnColCords) !== 'undefined'){
-        if(pieceOnColCords[0] !== colorOfPiece){
+    let colorOfPiece = piece[0];
+    let col = parseInt(String(currentPos)[0])
+    let row = parseInt(String(currentPos)[1])
+    let moveCol = parseInt(String(pos)[0])
+    let moveRow = parseInt(String(pos)[1])
+    let colArr = []
+    let rowArr = []
+    for(let i=8; i>=1; i--){
+      let rowCords = `${col}${i}`;//parseInt(String(col)+String(i));
+      let colCords = `${i}${row}`;
+      let pieceOnColCords = place.value[ parseInt( posInArr[colCords] ) ].classList[3];
+      let pieceOnRowCords = place.value[ parseInt( posInArr[rowCords] ) ].classList[3];
+      
+      if(parseInt(colCords) !== parseInt(currentPos)){
+        if(typeof(pieceOnColCords) === 'undefined'){
+          // console.log("con1 ",colCords)
           colArr.push(colCords)
         }
+        else if(typeof(pieceOnColCords) !== 'undefined'){
+          if(pieceOnColCords[0] !== colorOfPiece){
+            colArr.push(colCords)
+          }
+        }
       }
-    }
-   
-    if(parseInt(rowCords) !== parseInt(currentPos)){
-      if(typeof(pieceOnRowCords) === 'undefined'){
-        rowArr.push(rowCords)
-      }
-      else if(typeof(pieceOnRowCords) !== 'undefined'){
-        if(pieceOnRowCords[0] !== colorOfPiece) 
-          rowArr.push(rowCords)
-      }
-    }
-  }
-
-  // if(col == moveCol){
-  //   console.log("move along vertical",rowArr)
-  // }else{
-  //   console.log("move along horizontal",colArr)
-
-  // }
-      
-
-   console.log(colArr.concat(rowArr))
- }
-
- function getAvailableMovesOfCastle(currentPos, pos, piece){
-  let colorOfPiece = piece[0];
-  let col = parseInt(String(currentPos)[0])
-  let row = parseInt(String(currentPos)[1])
-  let moveCol = parseInt(String(pos)[0])
-  let moveRow = parseInt(String(pos)[1])
-  let limit = 0
-  let start = 0
-  let validMove = true
-  let removeFirstPiece = 0
-
-  if(col == moveCol){
-    console.log("vertically")
-    limit=(row>moveRow)? row: moveRow
-    start=(row<moveRow)? row: moveRow
     
-    for(let i=start;i<=limit;i++){
-      if(`${col}${i}`!== String(currentPos)){
-        if(currentBoard[`${col}${i}`] !== ''){//cannot jump
-          console.log(`${col}${i}`,currentBoard[`${col}${i}`],currentBoard[`${col}${i}`][0]=='b')
-          validMove = false
-          currentBoard[`${col}${i}`][0] !==colorOfPiece ? removeFirstPiece++ : removeFirstPiece;
+      if(parseInt(rowCords) !== parseInt(currentPos)){
+        if(typeof(pieceOnRowCords) === 'undefined'){
+          rowArr.push(rowCords)
+        }
+        else if(typeof(pieceOnRowCords) !== 'undefined'){
+          if(pieceOnRowCords[0] !== colorOfPiece) 
+            rowArr.push(rowCords)
         }
       }
     }
-  }else if(row == moveRow){
-    console.log("horizontal")
-    limit=(col>moveCol)? col: moveCol;
-    start=(col<moveCol)? col: moveCol;
 
-    for(let i=start;i<=limit;i++){
-      if(`${i}${row}`!== String(currentPos)){
-        if(currentBoard[`${i}${row}`] !== ''){//cannot jump
-            console.log(`${i}${row}`,currentBoard[`${i}${row}`],currentBoard[`${i}${row}`][0]=='b')
+    // if(col == moveCol){
+    //   console.log("move along vertical",rowArr)
+    // }else{
+    //   console.log("move along horizontal",colArr)
+
+    // }
+        
+
+    console.log(colArr.concat(rowArr))
+  }
+
+  function getAvailableMovesOfCastle(currentPos, pos, piece){
+    let colorOfPiece = piece[0];
+    let col = parseInt(String(currentPos)[0])
+    let row = parseInt(String(currentPos)[1])
+    let moveCol = parseInt(String(pos)[0])
+    let moveRow = parseInt(String(pos)[1])
+    let limit = 0
+    let start = 0
+    let validMove = true
+    let removeFirstPiece = 0
+
+    if(col == moveCol){
+      console.log("vertically")
+      limit=(row>moveRow)? row: moveRow
+      start=(row<moveRow)? row: moveRow
+      
+      for(let i=start;i<=limit;i++){
+        if(`${col}${i}`!== String(currentPos)){
+          if(currentBoard[`${col}${i}`] !== ''){//cannot jump
+            console.log(`${col}${i}`,currentBoard[`${col}${i}`],currentBoard[`${col}${i}`][0]=='b')
             validMove = false
-            currentBoard[`${col}${i}`][0] !== removeFirstPiece? removeFirstPiece++ : removeFirstPiece;
+            currentBoard[`${col}${i}`][0] !==colorOfPiece ? removeFirstPiece++ : removeFirstPiece;
+          }
         }
       }
-    }
-  }else 
-    validMove = false
+    }else if(row == moveRow){
+      console.log("horizontal")
+      limit=(col>moveCol)? col: moveCol;
+      start=(col<moveCol)? col: moveCol;
 
-  console.log(validMove, removeFirstPiece);
-  if(removeFirstPiece==1){ // if removing first peice
-    validMove = true
-  }
-  removeFirstPiece = 0;
-  return validMove
-}
+      for(let i=start;i<=limit;i++){
+        if(`${i}${row}`!== String(currentPos)){
+          if(currentBoard[`${i}${row}`] !== ''){//cannot jump
+              console.log(`${i}${row}`,currentBoard[`${i}${row}`],currentBoard[`${i}${row}`][0]=='b')
+              validMove = false
+              currentBoard[`${col}${i}`][0] !== removeFirstPiece? removeFirstPiece++ : removeFirstPiece;
+          }
+        }
+      }
+    }else 
+      validMove = false
 
-function  getAvailableMovesOfPawn(currentPos,selectedPiece){
-  let colorOfPiece = selectedPiece[0];
-  let defaultPosOfPiece = 0;// To make sure pawn is moving forward
-  let step = ''
-  avMoves = []
-  if(['wp','bp'].includes(selectedPiece)){
-    defaultPosOfPiece = String(defaultPos[selectedPiece][0])
-    currentPos = String(currentPos)
-    if(currentPos[1]==7){
-      defaultPos[colorOfPiece+'pm'] = '-'
-      currentBoard[currentPos[0]+6] == ''?avMoves.push(currentPos[0]+6): []
-      avMoves.length!==0 && currentBoard[currentPos[0]+5] == ''?avMoves.push(currentPos[0]+5): []
-    }else if(currentPos[1]==2){
-      defaultPos[colorOfPiece+'pm'] = '+'
-      currentBoard[currentPos[0]+3] == ''?avMoves.push(currentPos[0]+3): []
-      avMoves.length!==0 && currentBoard[currentPos[0]+4] == ''?avMoves.push(currentPos[0]+4): []
-    }else{
-        step = (defaultPos[colorOfPiece+'pm'])
-        currentBoard[currentPos[0]+parseInt(eval(currentPos[1]+step+1))] == ''?avMoves.push(currentPos[0]+parseInt(eval(currentPos[1]+step+1))): []  //using eval function to tell js that str is math oparation
-        avMoves.length!==0 && currentBoard[currentPos[0]+parseInt(eval(currentPos[1]+step+2))] && (currentPos[1]==7 || currentPos[1]==2) == ''?avMoves.push(currentPos[0]+parseInt(eval(currentPos[1]+step+2))): []
+    console.log(validMove, removeFirstPiece);
+    if(removeFirstPiece==1){ // if removing first peice
+      validMove = true
     }
-    console.log("inside avmoves",avMoves);
+    removeFirstPiece = 0;
+    return validMove
   }
-}
+
+  function  getAvailableMovesOfPawn(currentPos,selectedPiece){
+    let colorOfPiece = selectedPiece[0];
+    let defaultPosOfPiece = 0;// To get default pos of piece
+    let step = ''
+    avMoves = []
+    if(['wp','bp'].includes(selectedPiece)){
+      defaultPosOfPiece = String(defaultPos[selectedPiece][0])
+      currentPos = String(currentPos)
+      if(currentPos[1]==7){
+        defaultPos[colorOfPiece+'pm'] = '-'
+        currentBoard[currentPos[0]+6] == ''?avMoves.push(currentPos[0]+6): []
+        avMoves.length!==0 && currentBoard[currentPos[0]+5] == ''?avMoves.push(currentPos[0]+5): []
+      }else if(currentPos[1]==2){
+        defaultPos[colorOfPiece+'pm'] = '+'
+        currentBoard[currentPos[0]+3] == ''?avMoves.push(currentPos[0]+3): []
+        avMoves.length!==0 && currentBoard[currentPos[0]+4] == ''?avMoves.push(currentPos[0]+4): []
+      }else{
+          step = (defaultPos[colorOfPiece+'pm'])
+          currentBoard[currentPos[0]+parseInt(eval(currentPos[1]+step+1))] == ''?avMoves.push(currentPos[0]+parseInt(eval(currentPos[1]+step+1))): []  //using eval function to tell js that str is math oparation
+          avMoves.length!==0 && currentBoard[currentPos[0]+parseInt(eval(currentPos[1]+step+2))] && (currentPos[1]==7 || currentPos[1]==2) == ''?avMoves.push(currentPos[0]+parseInt(eval(currentPos[1]+step+2))): []
+      }
+      console.log("inside avmoves",avMoves);
+    }
+  }
 
   const castleMove = (currentPos, pos, selectedPiece) =>{
     let returnValue = true    
     returnValue = getAvailableMovesOfCastle(currentPos, pos, selectedPiece)
     return returnValue
+  }
+
+  function validatePos(pos, ogPos=0){ // takes pos and returns it if is valid
+      //Position should not have 0 and 9, and should be greater than 11
+      let colorOfP;
+      if(ogPos >0)
+        colorOfP = currentBoard[ogPos]
+
+      let returnValue =  !(String(pos).includes(0) || String(pos).includes(9)) && pos >=11
+      if(returnValue && ogPos >0)
+        returnValue = (colorOfP[0] !== currentBoard[pos][0])
+      return returnValue
+  }
+
+  const knightMoves = (pos) =>{
+      knightValidMoves = []
+      let tempPos = []
+      pos = parseInt(pos)
+      let ogPos = pos
+      tempPos.push(pos+2)
+      tempPos.push(pos-2)
+      for (let i in tempPos){
+          validatePos(tempPos[i]+10, ogPos) ? knightValidMoves.push(tempPos[i]+10): '';
+          validatePos(tempPos[i]-10, ogPos) ? knightValidMoves.push(tempPos[i]-10): '';
+      }
+      tempPos=[]
+      tempPos.push(pos+20)
+      tempPos.push(pos-20)
+      for (let i in tempPos){
+          validatePos(tempPos[i]+1, ogPos) ? knightValidMoves.push(tempPos[i]+1): '';
+          validatePos(tempPos[i]-1, ogPos) ? knightValidMoves.push(tempPos[i]-1): '';
+      }
+      console.log(knightValidMoves);
+  }
+
+  const bishopMoves = (pos)=>{
+    avMoves = [];
+    pos = parseInt(pos);
+
+    //Respective to white's postions 
+    let ru; //right upper 
+    let rl; //right lower
+    let lu; //left upper
+    let ll; //left lower
+
+    ru = rl =  lu =  ll = pos; //Assigning them og pos 
+    for(let i=1;i<8;i++){
+      if(validatePos(rl+11, pos)){
+        rl = rl+11
+        avMoves.push(rl)
+      }
+    
+      if(validatePos(lu-11, pos)){
+        lu = lu-11
+        avMoves.push(lu)
+      }
+    
+      if(validatePos(ll-9, pos)){
+        ll = ll-9
+        avMoves.push(ll)
+      }
+
+      if(validatePos(ru+9, pos)){
+        ru = ru+9
+        avMoves.push(ru)
+      }
+    }
   }
 
   const getPositionOfAllPieces=()=>{
@@ -178,8 +247,7 @@ function  getAvailableMovesOfPawn(currentPos,selectedPiece){
     if( countSteps == 0 && typeof(identifyPiece) === 'undefined')
       return 
 
-    //this code is block for when you have selected piece and clicking on some other piece of same side
-    console.log(selectedPiece ,identifyPiece)
+    //this code block is for when you have selected piece and clicking on some other piece of same side
     if(selectedPiece !== null && typeof(identifyPiece) !== 'undefined'){
       if(selectedPiece[0] == identifyPiece[0]){
         currentEvent.target.classList.remove('selected')
@@ -191,14 +259,13 @@ function  getAvailableMovesOfPawn(currentPos,selectedPiece){
     if(countSteps ==1 ){
       currentEvent = e
       getPositionOfAllPieces()
-      getAvailableMovesOfPawn(pos, identifyPiece)
       e.target.classList.add('selected')
       currentPos = pos
       selectedPiece = identifyPiece
     }
 
-    if(countSteps == 2 && currentEvent !== null){ //if clicking at same postion return it
-      if(currentPos == pos){
+    if(countSteps == 2 && currentEvent !== null){ 
+      if(currentPos == pos){//if selecting same postion as og pos
         validMove = false
         countSteps = 0
         currentEvent.target.classList.remove('selected')
@@ -214,12 +281,27 @@ function  getAvailableMovesOfPawn(currentPos,selectedPiece){
 
       // Inital moves of pawn
       if(['wp','bp'].includes(selectedPiece)){
+        // getAvailableMovesOfPawn(pos, selectedPiece)
         validMove = avMoves.includes(pos)
       }
 
-      //Elephant
+      //Elephant/ Rook
       if(['we','be'].includes(selectedPiece)){
         validMove = castleMove(currentPos, pos, selectedPiece)
+      }
+
+      //knight horse
+      if(['wh','bh'].includes(selectedPiece)){
+        knightMoves(currentPos)
+        validMove = knightValidMoves.includes(parseInt(pos));
+        console.log("knight move",knightValidMoves)
+      }
+
+      //Bishop/ Camel
+      if(['wb','bb'].includes(selectedPiece)){
+        bishopMoves(currentPos, pos, selectedPiece)
+        validMove = avMoves.includes(parseInt(pos));
+        console.log(avMoves, validMove)
       }
 
       if(validMove){
@@ -255,12 +337,12 @@ function  getAvailableMovesOfPawn(currentPos,selectedPiece){
     defaultPos['wp'] = [17,27,37,47,57,67,77,87]
     defaultPos['we'] = [18, 88]
     defaultPos['wh'] = [28, 78]
-    defaultPos['wb'] = [38, 68]
+    defaultPos['wb'] = [56, 68]
     defaultPos['wk'] = [48]
     defaultPos['wq'] = [58]
     defaultPos['bp'] = [12,22,32,42,52,62,72,82]
     defaultPos['be'] = [11,81]
-    defaultPos['bh'] = [21,71]
+    defaultPos['bh'] = [21,55]
     defaultPos['bb'] = [31,61]
     defaultPos['bq'] = [41]
     defaultPos['bk'] = [51]
@@ -285,7 +367,7 @@ function  getAvailableMovesOfPawn(currentPos,selectedPiece){
     <div class="board">
       <div  v-for=" i in 8" :key="i">
         <div v-for="j in 8" class='squares' v-bind:key="j" draggable="true" ref ="place"
-        :class="['square_'+String(i)+String(j)],[(i+j)%2 !==0? 'odd':'even']" v-on:click="movePiece($event, String(i)+String(j))">
+        :class="['square_'+String(i)+String(j)],[(i+j)%2 !==0? 'odd':'even'],av==String(i)+String(j)?'av':''" v-on:click="movePiece($event, String(i)+String(j))">
            {{ i }} {{ j }}
         </div>
       </div>
@@ -310,6 +392,10 @@ function  getAvailableMovesOfPawn(currentPos,selectedPiece){
   }
   .selected{
     background-color: #ff7979;
+    background-blend-mode: hard-light;
+  }
+  .av{
+    background-color: #41edff;
     background-blend-mode: hard-light;
   }
   .bq{
